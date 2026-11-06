@@ -17,6 +17,18 @@ public class LearnerIntegrationTests
         var response = await client.PostAsJsonAsync("/api/cases", entry);
         var records = await client.GetFromJsonAsync<List<Case>>("/api/cases");
         // TODO: HTTP-Status, gespeicherte Werte und Entscheidung prüfen.
-        Assert.Fail("TODO: Assertions gemäss Arbeitsauftrag ergänzen.");
+        Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+
+        Assert.IsNotNull(records);
+        Assert.AreEqual(1, records.Count);
+
+        var savedCase = records[0];
+
+        Assert.AreEqual("Sam Test", savedCase.Applicant.Name);
+        Assert.AreEqual("Orion", savedCase.Applicant.Planet);
+        Assert.AreEqual("Tourismus", savedCase.Applicant.Purpose);
+        Assert.AreEqual(30, savedCase.Applicant.Days);
+
+        Assert.AreEqual(new Verdict("approved", "Einreise bewilligt. Verhalten Sie sich unauffällig. Die Menschheit hat bereits genug Fragen."), EntryPolicy.Evaluate(savedCase.Applicant));
     }
 }
